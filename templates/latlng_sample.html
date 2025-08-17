@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lat/Lng Input Sample</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f0f2f5; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { background: #fff; margin-top: 40px; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 32px 28px 24px 28px; width: 420px; max-width: 95vw; }
+        h2 { margin-top: 0; color: #333; font-weight: 700; text-align: center; }
+        .input-row { display: flex; gap: 10px; margin-bottom: 16px; }
+        input[type=number] { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 15px; outline: none; }
+        button { background: #2563eb; color: #fff; border: none; border-radius: 6px; padding: 10px 18px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        button:hover { background: #1749a7; }
+        #log { background: #f7f7fa; border-radius: 8px; padding: 16px; width: 100%; min-height: 60px; margin-top: 18px; font-size: 15px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Lat/Lng Input Sample</h2>
+    <form id="latlngForm" class="input-row">
+        <input type="number" step="any" id="latInput" placeholder="Latitude" required>
+        <input type="number" step="any" id="lngInput" placeholder="Longitude" required>
+        <button type="submit">Send</button>
+    </form>
+    <div id="log"></div>
+</div>
+<script>
+    const socket = io.connect('http://206.189.143.56:5001');
+    const log = document.getElementById('log');
+    document.getElementById('latlngForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const lat = parseFloat(document.getElementById('latInput').value);
+        const lng = parseFloat(document.getElementById('lngInput').value);
+        if (!isNaN(lat) && !isNaN(lng)) {
+            socket.emit('json', { latitude: lat, longitude: lng });
+            log.innerHTML += `<div>Sent: { lat: ${lat}, lng: ${lng} }</div>`;
+        }
+    });
+    socket.on('json', function(data) {
+        log.innerHTML += `<div>Received: ${JSON.stringify(data)}</div>`;
+    });
+</script>
+</body>
+</html>
